@@ -85,38 +85,50 @@ for bars in [bars1, bars2]:
                    f'{height:.3f}%',
                    ha='center', va='bottom', fontsize=9, fontweight='bold')
 
-# Panel B: Conditional FDR (among k-mers WITH errors)
+# Panel B: Error Fate - Novel vs Cross-Contamination (CRITICAL DISTINCTION!)
 ax = axes[0, 1]
-summary_cond = df.groupby(['k_size', 'region'])['conditional_fdr'].agg(['mean', 'std']).reset_index()
 
-arms_cond = summary_cond[summary_cond['region'] == 'ARMS'].sort_values('k_size')
-cen_cond = summary_cond[summary_cond['region'] == 'CEN'].sort_values('k_size')
+# Get both novel and cross-contamination rates
+summary_novel = df.groupby(['k_size', 'region'])['pct_becomes_novel'].agg(['mean', 'std']).reset_index()
+summary_cross = df.groupby(['k_size', 'region'])['pct_wrong_db'].agg(['mean', 'std']).reset_index()
 
-bars1 = ax.bar(x - width/2, arms_cond['mean'], width, label='ARMS',
-               color='#66c2a5', yerr=arms_cond['std'], capsize=5)
-bars2 = ax.bar(x + width/2, cen_cond['mean'], width, label='CEN',
-               color='#fc8d62', yerr=cen_cond['std'], capsize=5)
+arms_novel = summary_novel[summary_novel['region'] == 'ARMS'].sort_values('k_size')
+cen_novel = summary_novel[summary_novel['region'] == 'CEN'].sort_values('k_size')
+arms_cross = summary_cross[summary_cross['region'] == 'ARMS'].sort_values('k_size')
+cen_cross = summary_cross[summary_cross['region'] == 'CEN'].sort_values('k_size')
+
+# Plot novel rate (stacked bottom)
+bar_width = 0.35
+bars_novel_arms = ax.bar(x - bar_width/2, arms_novel['mean'], bar_width,
+                          label='ARMS - Novel (lost)', color='#66c2a5', alpha=0.6)
+bars_novel_cen = ax.bar(x + bar_width/2, cen_novel['mean'], bar_width,
+                         label='CEN - Novel (lost)', color='#fc8d62', alpha=0.6)
+
+# Plot cross-contamination on top (THE DANGEROUS ONE!)
+bars_cross_arms = ax.bar(x - bar_width/2, arms_cross['mean'], bar_width,
+                          bottom=arms_novel['mean'], label='ARMS - Cross-contam (FP!)',
+                          color='#d62728', hatch='///')
+bars_cross_cen = ax.bar(x + bar_width/2, cen_cross['mean'], bar_width,
+                         bottom=cen_novel['mean'], label='CEN - Cross-contam (FP!)',
+                         color='#ff7f0e', hatch='///')
 
 ax.set_xlabel('K-mer Size', fontweight='bold', fontsize=11)
-ax.set_ylabel('Conditional FDR (%)', fontweight='bold', fontsize=11)
-ax.set_title('B. FDR Among K-mers WITH Errors', fontweight='bold', loc='left', fontsize=12)
+ax.set_ylabel('% of K-mers WITH Errors', fontweight='bold', fontsize=11)
+ax.set_title('B. Error Fate: Novel vs Cross-Contamination', fontweight='bold', loc='left', fontsize=12)
 ax.set_xticks(x)
 ax.set_xticklabels([f'k={k}' for k in k_sizes])
-ax.legend(fontsize=10)
+ax.legend(fontsize=8, loc='upper right')
 ax.grid(axis='y', alpha=0.3)
+ax.set_ylim(0, 100)
 
-# Add value labels
-for bars in [bars1, bars2]:
-    for bar in bars:
-        height = bar.get_height()
-        if height > 0:
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                   f'{height:.2f}%',
-                   ha='center', va='bottom', fontsize=9)
+# Add annotation
+ax.text(0.02, 0.98, '⚠️ Cross-contamination = FALSE POSITIVES (dangerous!)\n✓ Novel = Information loss only',
+        transform=ax.transAxes, fontsize=9, va='top',
+        bbox=dict(boxstyle='round', facecolor='yellow', alpha=0.3))
 
-# Panel C: Heatmap of conditional FDR by database
+# Panel C: Heatmap of Cross-Contamination Rate by database (THE DANGEROUS ONE!)
 ax = axes[1, 0]
-pivot = df.pivot_table(values='conditional_fdr',
+pivot = df.pivot_table(values='pct_wrong_db',
                        index='database',
                        columns='k_size')
 pivot = pivot.sort_index()
@@ -127,12 +139,12 @@ cen_dbs = [db for db in pivot.index if '_CEN_' in db]
 ordered_dbs = sorted(arms_dbs) + sorted(cen_dbs)
 pivot = pivot.loc[ordered_dbs]
 
-sns.heatmap(pivot, annot=True, fmt='.1f', cmap='RdYlGn_r',
-            cbar_kws={'label': 'FDR (%)'},
-            ax=ax, linewidths=0.5, vmin=0, vmax=100)
+sns.heatmap(pivot, annot=True, fmt='.2f', cmap='RdYlGn_r',
+            cbar_kws={'label': 'Cross-Contamination (%)'},
+            ax=ax, linewidths=0.5, vmin=0, vmax=1.0)
 ax.set_xlabel('K-mer Size', fontweight='bold', fontsize=11)
 ax.set_ylabel('Database', fontweight='bold', fontsize=11)
-ax.set_title('C. Per-Database FDR Values', fontweight='bold', loc='left', fontsize=12)
+ax.set_title('C. Cross-Contamination Rate (False Positives!)', fontweight='bold', loc='left', fontsize=12)
 
 # Add separator line between ARMS and CEN
 separator_idx = len(arms_dbs)
@@ -140,21 +152,21 @@ ax.axhline(y=separator_idx, color='blue', linewidth=3)
 ax.text(-0.5, separator_idx/2, 'ARMS', rotation=90, va='center', fontweight='bold', fontsize=10)
 ax.text(-0.5, separator_idx + (len(cen_dbs)/2), 'CEN', rotation=90, va='center', fontweight='bold', fontsize=10)
 
-# Panel D: Comparison - ARMS vs CEN vulnerability
+# Panel D: Database Cross-Contamination Ranking (FALSE POSITIVE RISK!)
 ax = axes[1, 1]
 
-# Calculate mean conditional FDR across all k-sizes for each database
-db_summary = df.groupby(['database', 'region'])['conditional_fdr'].mean().reset_index()
-db_summary = db_summary.sort_values('conditional_fdr')
+# Calculate mean cross-contamination rate across all k-sizes for each database
+db_summary = df.groupby(['database', 'region'])['pct_wrong_db'].mean().reset_index()
+db_summary = db_summary.sort_values('pct_wrong_db')
 
 colors = ['#66c2a5' if r == 'ARMS' else '#fc8d62' for r in db_summary['region']]
-bars = ax.barh(range(len(db_summary)), db_summary['conditional_fdr'], color=colors)
+bars = ax.barh(range(len(db_summary)), db_summary['pct_wrong_db'], color=colors)
 ax.set_yticks(range(len(db_summary)))
 ax.set_yticklabels(db_summary['database'], fontsize=8)
-ax.set_xlabel('Mean Conditional FDR (%)', fontweight='bold', fontsize=11)
-ax.set_title('D. Database Conditional FDR Ranking\n(averaged across k-sizes)', fontweight='bold', loc='left', fontsize=12)
+ax.set_xlabel('Mean Cross-Contamination Rate (%)', fontweight='bold', fontsize=11)
+ax.set_title('D. Database False Positive Risk Ranking\n(averaged across k-sizes)', fontweight='bold', loc='left', fontsize=12)
 ax.grid(axis='x', alpha=0.3)
-ax.axvline(x=50.0, color='orange', linestyle='--', alpha=0.5, linewidth=2, label='50% threshold')
+ax.axvline(x=0.5, color='orange', linestyle='--', alpha=0.5, linewidth=2, label='0.5% threshold')
 
 # Add legend
 from matplotlib.patches import Patch
@@ -170,21 +182,22 @@ print(f"✓ Saved: final_results/02_cross_contamination.pdf")
 
 # Print summary
 print("\n" + "="*80)
-print("FALSE DISCOVERY RATE (FDR) SUMMARY")
+print("ERROR FATE AND CROSS-CONTAMINATION SUMMARY")
 print("="*80)
-print(f"{'K-mer':<8} {'Region':<8} {'Mean FDR':<15} {'Max FDR':<15}")
+print(f"{'K-mer':<8} {'Region':<8} {'Novel (lost)':<15} {'Cross-Contam (FP!)':<20} {'Absolute FDR':<15}")
 print("-"*80)
 for k in k_sizes:
     for region in ['ARMS', 'CEN']:
         subset = df[(df['k_size'] == k) & (df['region'] == region)]
-        mean_abs = subset['absolute_fdr'].mean()
-        mean_cond = subset['conditional_fdr'].mean()
-        print(f"k={k:<5} {region:<8} Abs: {mean_abs:>6.4f}%    Cond: {mean_cond:>6.2f}%")
+        mean_novel = subset['pct_becomes_novel'].mean()
+        mean_cross = subset['pct_wrong_db'].mean()
+        mean_abs_fdr = subset['absolute_fdr'].mean()
+        print(f"k={k:<5} {region:<8} {mean_novel:>6.2f}%          {mean_cross:>6.3f}%               {mean_abs_fdr:>6.4f}%")
 print("="*80)
 print("\n💡 Key Findings:")
-print(f"   • FDR = FP/(FP+TP) - proper false discovery rate calculation")
-print(f"   • High conditional FDR (45-100%) means errors rarely stay correctly classified")
-print(f"   • BUT: ~99% of errors become 'novel' k-mers (read loss, not false positive)")
-print(f"   • CEN markers have lower FDR than ARMS (better error tolerance)")
-print(f"   • Absolute impact on false positives remains very low (<0.2% of all k-mers)")
+print(f"   • ~99% of errors → NOVEL k-mers (information loss, not false positive)")
+print(f"   • <1% of errors → CROSS-CONTAMINATION (FALSE POSITIVES - the dangerous one!)")
+print(f"   • Longer k-mers (k=41) have LOWER cross-contamination (more specific)")
+print(f"   • Absolute FDR <0.2% for all k-mer sizes ✓ EXCELLENT specificity!")
+print(f"   • Main problem: Read LOSS (19-34%), not false positives")
 print("="*80)
