@@ -137,63 +137,167 @@ python3 07_objective_comparison.py
 
 ### 1. Marker Availability Analysis (`01_marker_availability.py`)
 
+![Marker Availability](final_results/01_marker_availability.png)
+
 **Evaluates**: Marker quantity and distribution
 
-**Outputs**:
-- Total k-mer counts per database
-- Marker density (k-mers/Mb)
-- Distribution uniformity (CV)
-- Coverage consistency
+**What it shows**:
+- **Panel A**: Total k-mer counts (ARMS vs CEN regions)
+- **Panel B**: Marker density normalized per megabase
+- **Panel C**: Distribution of marker counts across databases
+- **Panel D**: Uniformity (Coefficient of Variation)
 
-**Figure**: 4-panel visualization
+**Key Finding**: Larger k-mers (k=41) provide 5.6M markers vs 3.5M for k=21, but with diminishing returns in density.
+
+---
 
 ### 2. False Discovery Rate Analysis (`02_cross_contamination.py`)
 
-**Evaluates**: Risk of misclassification from sequencing errors
+![FDR Analysis](final_results/02_cross_contamination.png)
 
-**Metrics**:
-- **FDR = FP/(FP+TP)** - Proper false discovery rate
-- Absolute FDR (% of ALL k-mers)
-- Conditional FDR (% of k-mers WITH errors)
-- Per-database vulnerability
+**Evaluates**: Risk of misclassification from sequencing errors using **proper FDR calculation**
 
-**Key Question**: Do sequencing errors cause false positives?
+**What is FDR?**
+- **FDR = FP / (FP + TP)** - False Discovery Rate
+- **FP** (False Positives): K-mers with errors that match the WRONG database
+- **TP** (True Positives): K-mers with errors that still match the CORRECT database
+- This is the standard metric in bioinformatics for assessing discovery quality
 
-**Figure**: 4-panel heatmap and comparison
+**What it shows**:
+- **Panel A**: Absolute FDR (among ALL k-mers) - **MOST IMPORTANT!**
+  - Shows <0.2% for all k-mer sizes ✓ Excellent!
+  - This means very few k-mers become false positives overall
+
+- **Panel B**: Conditional FDR (among k-mers WITH errors)
+  - ARMS: 93-94% (very high)
+  - CEN: 45-63% (moderate)
+  - This means when errors occur, they rarely stay correctly classified
+
+- **Panel C**: Per-database FDR heatmap
+  - Detailed view showing variation across chromosomes
+
+- **Panel D**: Database ranking by FDR
+  - CEN markers have lower FDR (better error tolerance)
+
+**Understanding the FDR Results**:
+
+🔍 **Why is Conditional FDR so high (45-100%) but Absolute FDR so low (<0.2%)?**
+
+Here's what happens when a sequencing error occurs in a k-mer:
+
+```
+Original k-mer with error → 3 possible outcomes:
+
+1. ✓ Still matches CORRECT database (0.06%) → True Positive (TP)
+2. ✗ Matches WRONG database (0.7%) → False Positive (FP)
+3. ○ Doesn't match ANY database (99.2%) → Novel k-mer (read lost)
+```
+
+**The math**:
+- **Conditional FDR** = FP / (FP + TP) = 0.7 / (0.7 + 0.06) = **92%**
+  - Among the small fraction (0.76%) that still match a database, most (92%) are wrong!
+
+- **Absolute FDR** = (% with errors) × (Conditional FDR)
+  - For k=21: 19% × 92% × 0.76% = **0.13%** of ALL k-mers
+  - This is excellent! Very few false positives overall.
+
+**The Key Insight**:
+- 📉 **99% of errors become "novel" k-mers** → causes read LOSS (bad for sensitivity)
+- ✅ **<1% of errors match wrong database** → very few FALSE POSITIVES (good for specificity)
+- ⚖️ **Trade-off**: High specificity but reduced read retention
+
+**What this means for your analysis**:
+- You can trust your positive calls (FDR < 0.2%)
+- But you'll lose ~19-34% of reads (depending on k-mer size)
+- Shorter k-mers (k=21) minimize read loss while maintaining excellent specificity
+
+---
 
 ### 3. Error Resilience Analysis (`03_error_resilience.py`)
 
-**Evaluates**: Read retention under realistic ONT sequencing
+![Error Resilience](final_results/03_error_resilience.png)
 
-**Simulation**:
-- 1% per-base error rate (Bernoulli distribution)
-- 100,000 k-mers per database
-- Random base substitutions
+**Evaluates**: Read retention under realistic ONT sequencing (1% per-base error rate)
 
-**Metrics**:
-- Percentage of usable reads after errors
-- Error impact by k-mer size
-- Practical impact with 1M reads
+**What it shows**:
+- **Panel A**: Read retention by k-mer size ⭐ **KEY METRIC**
+  - k=21: 81% retention (BEST!)
+  - k=41: 66% retention (15% worse!)
 
-**Figure**: 6-panel comprehensive analysis
+- **Panel B**: Percentage of k-mers affected by errors
+  - Follows formula: P(error) = 1 - (0.99)^k
+
+- **Panel C**: Error tolerance by region (ARMS vs CEN)
+
+- **Panel D**: Distribution of error tolerance across databases
+
+- **Panel E**: Error outcomes breakdown
+  - Shows the 99% novel / 0.06% TP / 0.7% FP split
+
+- **Panel F**: Practical impact with 1M reads
+  - k=21: 811,000 usable reads
+  - k=41: 663,000 usable reads
+  - **148,000 more reads with k=21!**
+
+**Key Finding**: k=21 retains **15% more reads** than k=41 under ONT error rates.
+
+---
 
 ### 4. Final Recommendation (`04_final_recommendation.py`)
 
-**Integrates**: All factors with weighted scoring
+![Final Recommendation](final_results/04_final_recommendation.png)
+
+**Integrates**: All factors with weighted scoring system
 
 **Scoring System**:
-- Read Retention: 40% (critical)
-- Specificity: 30%
-- Uniformity: 15%
-- Availability: 15%
+- Read Retention: 40% (critical for ONT)
+- Specificity: 30% (FDR control)
+- Uniformity: 15% (distribution)
+- Availability: 15% (marker count)
 
-**Output**: Multi-panel decision matrix
+**What it shows**:
+- **Panel A**: Overall weighted scores → **k=21 wins (70/100)**
+- **Panel B**: Explanation of scoring criteria
+- **Panel C**: Radar chart (k=21 vs k=41 comparison)
+- **Panel D**: Individual component scores
+- **Panel E**: Complete decision table with raw values
 
-### 5-7. Additional Visualizations
+**Recommendation**: **k=21** for ONT R9 data, **k=31** for balanced approach
 
-- **Radar Charts**: Pentagon comparison of all k-mer sizes
-- **Coverage Loss**: Detailed per-Mb impact analysis
-- **Objective Comparison**: Trade-off visualization without arbitrary weighting
+---
+
+### 5. Pentagon Radar Comparison (`05_radar_comparison.py`)
+
+![Radar Comparison](final_results/05_radar_comparison.png)
+
+**What it shows**: All k-mer sizes compared across 5 dimensions simultaneously
+- Usable reads (%)
+- Specificity (%)
+- Marker availability (millions)
+- Uniformity (%)
+- Error resilience (%)
+
+**Visual interpretation**: Larger pentagon area = better overall performance
+
+---
+
+### 6. Coverage Loss Analysis (`06_coverage_loss_analysis.py`)
+
+![Coverage Loss](final_results/06_coverage_loss_analysis.png)
+
+**What it shows**: How errors affect effective k-mer coverage per megabase
+- Initial density vs effective density after errors
+- Coverage loss by k-mer size and region
+
+---
+
+### 7. Objective Comparison (`07_objective_comparison.py`)
+
+![Objective Comparison](final_results/07_objective_comparison.png)
+
+**What it shows**: Side-by-side metric comparison without arbitrary weighting
+- Allows custom decision-making based on your priorities
+- No single "best" k-mer - depends on use case
 
 ---
 
