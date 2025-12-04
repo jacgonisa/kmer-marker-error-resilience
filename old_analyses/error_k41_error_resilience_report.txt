@@ -1,0 +1,172 @@
+======================================================================
+ERROR RESILIENCE ANALYSIS REPORT
+Simulating 1 sequencing error(s) per k-mer
+======================================================================
+
+ERROR RESILIENCE RANKING (best first)
+----------------------------------------
+1. Ler-0_CEN_Chr1: 0.1% error-tolerant
+2. Col-0_CEN_Chr5: 0.0% error-tolerant
+3. Ler-0_CEN_Chr2: 0.0% error-tolerant
+4. Col-0_CEN_Chr2: 0.0% error-tolerant
+5. Col-0_CEN_Chr4: 0.0% error-tolerant
+6. Ler-0_CEN_Chr5: 0.0% error-tolerant
+7. Col-0_ARMS_Chr1: 0.0% error-tolerant
+8. Col-0_ARMS_Chr2: 0.0% error-tolerant
+9. Col-0_ARMS_Chr3: 0.0% error-tolerant
+10. Col-0_ARMS_Chr4: 0.0% error-tolerant
+11. Col-0_ARMS_Chr5: 0.0% error-tolerant
+12. Col-0_CEN_Chr1: 0.0% error-tolerant
+13. Col-0_CEN_Chr3: 0.0% error-tolerant
+14. Ler-0_ARMS_Chr1: 0.0% error-tolerant
+15. Ler-0_ARMS_Chr2: 0.0% error-tolerant
+16. Ler-0_ARMS_Chr3: 0.0% error-tolerant
+17. Ler-0_ARMS_Chr4: 0.0% error-tolerant
+18. Ler-0_ARMS_Chr5: 0.0% error-tolerant
+19. Ler-0_CEN_Chr3: 0.0% error-tolerant
+20. Ler-0_CEN_Chr4: 0.0% error-tolerant
+
+======================================================================
+DETAILED STATISTICS
+======================================================================
+
+Col-0_ARMS_Chr1
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_ARMS_Chr2
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_ARMS_Chr3
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_ARMS_Chr4
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_ARMS_Chr5
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_CEN_Chr1
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_CEN_Chr2
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_CEN_Chr3
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_CEN_Chr4
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Col-0_CEN_Chr5
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 99.9%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_ARMS_Chr1
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_ARMS_Chr2
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_ARMS_Chr3
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_ARMS_Chr4
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_ARMS_Chr5
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_CEN_Chr1
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.1%
+  Becomes novel: 99.9%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_CEN_Chr2
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_CEN_Chr3
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_CEN_Chr4
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+
+Ler-0_CEN_Chr5
+  Tested: 5000 k-mers with errors
+  Error-tolerant: 0.0%
+  Becomes novel: 100.0%
+  Matches wrong DB: 0.0%
+  Becomes ambiguous: 0.0%
+

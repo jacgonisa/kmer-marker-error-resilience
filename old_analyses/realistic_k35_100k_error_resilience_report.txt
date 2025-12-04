@@ -1,0 +1,252 @@
+======================================================================
+REALISTIC ERROR RESILIENCE ANALYSIS REPORT
+Per-base sequencing error rate: 1.0% (ONT-like)
+======================================================================
+
+ERROR RESILIENCE RANKING (best first)
+----------------------------------------
+1. Ler-0_CEN_Chr1: 0.77% error-tolerant
+2. Col-0_CEN_Chr2: 0.70% error-tolerant
+3. Col-0_CEN_Chr1: 0.58% error-tolerant
+4. Ler-0_CEN_Chr2: 0.57% error-tolerant
+5. Col-0_CEN_Chr4: 0.47% error-tolerant
+6. Ler-0_CEN_Chr3: 0.46% error-tolerant
+7. Col-0_CEN_Chr3: 0.44% error-tolerant
+8. Col-0_CEN_Chr5: 0.38% error-tolerant
+9. Ler-0_CEN_Chr4: 0.37% error-tolerant
+10. Ler-0_CEN_Chr5: 0.34% error-tolerant
+11. Col-0_ARMS_Chr3: 0.07% error-tolerant
+12. Ler-0_ARMS_Chr3: 0.03% error-tolerant
+13. Ler-0_ARMS_Chr4: 0.03% error-tolerant
+14. Col-0_ARMS_Chr2: 0.02% error-tolerant
+15. Ler-0_ARMS_Chr1: 0.02% error-tolerant
+16. Col-0_ARMS_Chr4: 0.02% error-tolerant
+17. Col-0_ARMS_Chr1: 0.01% error-tolerant
+18. Ler-0_ARMS_Chr5: 0.01% error-tolerant
+19. Col-0_ARMS_Chr5: 0.01% error-tolerant
+20. Ler-0_ARMS_Chr2: 0.00% error-tolerant
+
+======================================================================
+DETAILED STATISTICS
+======================================================================
+
+Ler-0_CEN_Chr1
+  Tested: 77,410 k-mers
+  Had sequencing errors: 22,885 (29.56%)
+  Mean errors per k-mer: 0.349
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.77%
+    Becomes novel: 98.77%
+    Matches wrong DB: 0.46%
+    Becomes ambiguous: 0.00%
+
+Col-0_CEN_Chr2
+  Tested: 82,887 k-mers
+  Had sequencing errors: 24,547 (29.62%)
+  Mean errors per k-mer: 0.350
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.70%
+    Becomes novel: 98.77%
+    Matches wrong DB: 0.54%
+    Becomes ambiguous: 0.00%
+
+Col-0_CEN_Chr1
+  Tested: 79,133 k-mers
+  Had sequencing errors: 23,419 (29.59%)
+  Mean errors per k-mer: 0.348
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.58%
+    Becomes novel: 98.85%
+    Matches wrong DB: 0.57%
+    Becomes ambiguous: 0.00%
+
+Ler-0_CEN_Chr2
+  Tested: 56,193 k-mers
+  Had sequencing errors: 16,596 (29.53%)
+  Mean errors per k-mer: 0.349
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.57%
+    Becomes novel: 98.88%
+    Matches wrong DB: 0.55%
+    Becomes ambiguous: 0.00%
+
+Col-0_CEN_Chr4
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,557 (29.56%)
+  Mean errors per k-mer: 0.349
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.47%
+    Becomes novel: 99.05%
+    Matches wrong DB: 0.48%
+    Becomes ambiguous: 0.00%
+
+Ler-0_CEN_Chr3
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,659 (29.66%)
+  Mean errors per k-mer: 0.351
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.46%
+    Becomes novel: 99.20%
+    Matches wrong DB: 0.34%
+    Becomes ambiguous: 0.00%
+
+Col-0_CEN_Chr3
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,609 (29.61%)
+  Mean errors per k-mer: 0.349
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.44%
+    Becomes novel: 99.04%
+    Matches wrong DB: 0.52%
+    Becomes ambiguous: 0.00%
+
+Col-0_CEN_Chr5
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,330 (29.33%)
+  Mean errors per k-mer: 0.346
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.38%
+    Becomes novel: 99.18%
+    Matches wrong DB: 0.44%
+    Becomes ambiguous: 0.00%
+
+Ler-0_CEN_Chr4
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,815 (29.82%)
+  Mean errors per k-mer: 0.352
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.37%
+    Becomes novel: 99.17%
+    Matches wrong DB: 0.46%
+    Becomes ambiguous: 0.00%
+
+Ler-0_CEN_Chr5
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,702 (29.70%)
+  Mean errors per k-mer: 0.351
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.34%
+    Becomes novel: 99.17%
+    Matches wrong DB: 0.48%
+    Becomes ambiguous: 0.00%
+
+Col-0_ARMS_Chr3
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,601 (29.60%)
+  Mean errors per k-mer: 0.349
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.07%
+    Becomes novel: 99.52%
+    Matches wrong DB: 0.41%
+    Becomes ambiguous: 0.00%
+
+Ler-0_ARMS_Chr3
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,596 (29.60%)
+  Mean errors per k-mer: 0.349
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.03%
+    Becomes novel: 99.64%
+    Matches wrong DB: 0.33%
+    Becomes ambiguous: 0.00%
+
+Ler-0_ARMS_Chr4
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,627 (29.63%)
+  Mean errors per k-mer: 0.348
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.03%
+    Becomes novel: 99.66%
+    Matches wrong DB: 0.31%
+    Becomes ambiguous: 0.00%
+
+Col-0_ARMS_Chr2
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,859 (29.86%)
+  Mean errors per k-mer: 0.353
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.02%
+    Becomes novel: 99.67%
+    Matches wrong DB: 0.31%
+    Becomes ambiguous: 0.00%
+
+Ler-0_ARMS_Chr1
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,753 (29.75%)
+  Mean errors per k-mer: 0.350
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.02%
+    Becomes novel: 99.66%
+    Matches wrong DB: 0.32%
+    Becomes ambiguous: 0.00%
+
+Col-0_ARMS_Chr4
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,339 (29.34%)
+  Mean errors per k-mer: 0.346
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.02%
+    Becomes novel: 99.63%
+    Matches wrong DB: 0.36%
+    Becomes ambiguous: 0.00%
+
+Col-0_ARMS_Chr1
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,556 (29.56%)
+  Mean errors per k-mer: 0.348
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.01%
+    Becomes novel: 99.63%
+    Matches wrong DB: 0.36%
+    Becomes ambiguous: 0.00%
+
+Ler-0_ARMS_Chr5
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,704 (29.70%)
+  Mean errors per k-mer: 0.351
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.01%
+    Becomes novel: 99.60%
+    Matches wrong DB: 0.38%
+    Becomes ambiguous: 0.00%
+
+Col-0_ARMS_Chr5
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,438 (29.44%)
+  Mean errors per k-mer: 0.348
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.01%
+    Becomes novel: 99.65%
+    Matches wrong DB: 0.34%
+    Becomes ambiguous: 0.00%
+
+Ler-0_ARMS_Chr2
+  Tested: 100,000 k-mers
+  Had sequencing errors: 29,640 (29.64%)
+  Mean errors per k-mer: 0.349
+  
+  Of k-mers WITH errors:
+    Error-tolerant: 0.00%
+    Becomes novel: 99.67%
+    Matches wrong DB: 0.33%
+    Becomes ambiguous: 0.00%
+

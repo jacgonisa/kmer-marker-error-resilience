@@ -1,0 +1,50 @@
+=======================================================================
+COMPARISON OF ERROR RESILIENCE ACROSS K-MER SIZES
+=======================================================================
+
+This analysis simulates 1 sequencing error per k-mer and tests if the
+mutated k-mer still uniquely identifies the correct database.
+
+KEY FINDING: All k-mer sizes show ~0% error tolerance!
+This means: When a k-mer gets 1 sequencing error, it almost never
+still uniquely maps to the correct database.
+
+COMPARISON TABLE:
+-----------------
+K-mer Size | Mean Error Tolerance | Main Outcome
+-----------|---------------------|----------------------------------
+K=21       | 0.0%                | ~100% become novel (no match)
+K=25       | 0.0%                | ~100% become novel (no match)
+K=31       | 0.0%                | ~100% become novel (no match)
+K=35       | 0.0%                | ~100% become novel (no match)
+K=41       | 0.0%                | ~100% become novel (no match)
+
+INTERPRETATION:
+===============
+
+1. NO SIGNIFICANT DIFFERENCE between k-mer sizes for error tolerance!
+   - All k-mer sizes are equally fragile to single-base errors
+   - This is because your markers are UNIQUE k-mers
+
+2. Longer k-mers (k=31, k=41) are actually WORSE in practice:
+   - Higher probability of containing an error (longer sequence)
+   - K=21: ~2.1% error rate per k-mer
+   - K=31: ~3.1% error rate per k-mer  
+   - K=41: ~4.1% error rate per k-mer
+
+3. When error occurs, outcome is typically "novel":
+   - Mutated k-mer doesn't match ANY database
+   - This means the read is LOST, not misclassified
+   - Low risk of FALSE POSITIVES (good!)
+   - But higher LOSS of reads with longer k-mers
+
+RECOMMENDATION:
+===============
+Use K=21 or K=25 for your markers:
+✓ Lower error probability per k-mer
+✓ More reads retained
+✓ No advantage to longer k-mers for error tolerance
+✓ Shorter k-mers still provide sufficient specificity
+
+The theoretical advantage of longer k-mers (better specificity)
+is negated by their practical disadvantage (higher error rate).
