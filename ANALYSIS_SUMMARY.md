@@ -37,17 +37,21 @@
 
 **Key Finding**: k=21 retains **147,585 more reads per million** compared to k=41!
 
-### Cross-Contamination Risk
+### False Discovery Rate (FDR = FP/(FP+TP))
 
-| K-mer | ARMS (mean) | CEN (mean) | Overall Assessment |
-|-------|-------------|------------|-------------------|
-| k=21 | 0.138% | 0.188% | ✓ Excellent |
-| k=25 | 0.120% | 0.186% | ✓ Excellent |
-| k=31 | 0.110% | 0.160% | ✓ Excellent |
-| k=35 | 0.102% | 0.143% | ✓ Excellent |
-| k=41 | 0.092% | 0.124% | ✓ Excellent |
+**Conditional FDR (among k-mers WITH errors):**
 
-**All k-mer sizes show excellent specificity (<0.2% false positive rate)**
+| K-mer | ARMS (mean) | CEN (mean) | Interpretation |
+|-------|-------------|------------|----------------|
+| k=21 | 93.11% | 62.93% | High - errors rarely stay correctly classified |
+| k=25 | 93.57% | 59.16% | High - errors rarely stay correctly classified |
+| k=31 | 92.91% | 55.68% | High - errors rarely stay correctly classified |
+| k=35 | 93.93% | 49.44% | High - errors rarely stay correctly classified |
+| k=41 | 93.79% | 45.07% | High - errors rarely stay correctly classified |
+
+**Absolute FDR (all k-mers)**: <0.2% for all k-mer sizes ✓ Excellent
+
+**Important Note**: High conditional FDR means that when errors occur, they rarely maintain correct classification. However, ~99% of errors become "novel" k-mers (not found in any database), causing read loss rather than false positives. The absolute impact on false positives remains very low (<0.2%).
 
 ### Marker Availability
 

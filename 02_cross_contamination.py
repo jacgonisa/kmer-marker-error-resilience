@@ -68,11 +68,12 @@ ax.legend(fontsize=10)
 ax.grid(axis='y', alpha=0.3)
 ax.set_ylim(0, max(ax.get_ylim()[1], 0.25))
 
-# Add annotation for "excellent" threshold (FDR < 5% is generally considered good)
-ax.axhline(y=5.0, color='green', linestyle='--', alpha=0.5, linewidth=2)
-ax.text(len(k_sizes)-0.3, 5.2, '✓ EXCELLENT (<5% FDR)',
-        ha='right', va='bottom', fontsize=10, color='green', fontweight='bold',
-        bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.3))
+# Add annotation - Note: High conditional FDR is expected since most errors become novel
+# The key metric is absolute FDR (how many of ALL k-mers become false positives)
+ax.axhline(y=50.0, color='orange', linestyle='--', alpha=0.5, linewidth=2)
+ax.text(len(k_sizes)-0.3, 52, 'Note: High conditional FDR expected',
+        ha='right', va='bottom', fontsize=9, color='orange',
+        bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.3))
 
 # Add value labels
 for bars in [bars1, bars2]:
@@ -152,7 +153,7 @@ ax.set_yticklabels(db_summary['database'], fontsize=8)
 ax.set_xlabel('Mean FDR (%)', fontweight='bold', fontsize=11)
 ax.set_title('D. Database FDR Ranking\n(averaged across k-sizes)', fontweight='bold', loc='left', fontsize=12)
 ax.grid(axis='x', alpha=0.3)
-ax.axvline(x=5.0, color='green', linestyle='--', alpha=0.5, linewidth=2)
+ax.axvline(x=50.0, color='orange', linestyle='--', alpha=0.5, linewidth=2)
 
 # Add legend
 from matplotlib.patches import Patch
@@ -181,7 +182,8 @@ for k in k_sizes:
 print("="*80)
 print("\n💡 Key Findings:")
 print(f"   • FDR = FP/(FP+TP) - proper false discovery rate calculation")
-print(f"   • All FDR values well controlled (FDR < 5% is excellent)")
-print(f"   • CEN markers show higher FDR than ARMS (as expected)")
-print(f"   • Most errors become 'novel' k-mers, preventing false positives")
+print(f"   • High conditional FDR (45-100%) means errors rarely stay correctly classified")
+print(f"   • BUT: ~99% of errors become 'novel' k-mers (read loss, not false positive)")
+print(f"   • CEN markers have lower FDR than ARMS (better error tolerance)")
+print(f"   • Absolute impact on false positives remains very low (<0.2% of all k-mers)")
 print("="*80)
