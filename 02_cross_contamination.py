@@ -85,46 +85,50 @@ for bars in [bars1, bars2]:
                    f'{height:.3f}%',
                    ha='center', va='bottom', fontsize=9, fontweight='bold')
 
-# Panel B: Error Fate - Novel vs Cross-Contamination (CRITICAL DISTINCTION!)
+# Panel B: Cross-Contamination Rate (THE DANGEROUS ONE!) - Focus on what matters!
 ax = axes[0, 1]
 
-# Get both novel and cross-contamination rates
-summary_novel = df.groupby(['k_size', 'region'])['pct_becomes_novel'].agg(['mean', 'std']).reset_index()
+# Get cross-contamination rates (the biologically important metric!)
 summary_cross = df.groupby(['k_size', 'region'])['pct_wrong_db'].agg(['mean', 'std']).reset_index()
 
-arms_novel = summary_novel[summary_novel['region'] == 'ARMS'].sort_values('k_size')
-cen_novel = summary_novel[summary_novel['region'] == 'CEN'].sort_values('k_size')
 arms_cross = summary_cross[summary_cross['region'] == 'ARMS'].sort_values('k_size')
 cen_cross = summary_cross[summary_cross['region'] == 'CEN'].sort_values('k_size')
 
-# Plot novel rate (stacked bottom)
+# Plot with error bars
 bar_width = 0.35
-bars_novel_arms = ax.bar(x - bar_width/2, arms_novel['mean'], bar_width,
-                          label='ARMS - Novel (lost)', color='#66c2a5', alpha=0.6)
-bars_novel_cen = ax.bar(x + bar_width/2, cen_novel['mean'], bar_width,
-                         label='CEN - Novel (lost)', color='#fc8d62', alpha=0.6)
-
-# Plot cross-contamination on top (THE DANGEROUS ONE!)
-bars_cross_arms = ax.bar(x - bar_width/2, arms_cross['mean'], bar_width,
-                          bottom=arms_novel['mean'], label='ARMS - Cross-contam (FP!)',
-                          color='#d62728', hatch='///')
-bars_cross_cen = ax.bar(x + bar_width/2, cen_cross['mean'], bar_width,
-                         bottom=cen_novel['mean'], label='CEN - Cross-contam (FP!)',
-                         color='#ff7f0e', hatch='///')
+bars1 = ax.bar(x - bar_width/2, arms_cross['mean'], bar_width, label='ARMS',
+               color='#d62728', yerr=arms_cross['std'], capsize=5, alpha=0.8, edgecolor='darkred', linewidth=2)
+bars2 = ax.bar(x + bar_width/2, cen_cross['mean'], bar_width, label='CEN',
+               color='#ff7f0e', yerr=cen_cross['std'], capsize=5, alpha=0.8, edgecolor='darkorange', linewidth=2)
 
 ax.set_xlabel('K-mer Size', fontweight='bold', fontsize=11)
-ax.set_ylabel('% of K-mers WITH Errors', fontweight='bold', fontsize=11)
-ax.set_title('B. Error Fate: Novel vs Cross-Contamination', fontweight='bold', loc='left', fontsize=12)
+ax.set_ylabel('Cross-Contamination Rate (%)\n(% of errors → wrong database)', fontweight='bold', fontsize=11)
+ax.set_title('B. Cross-Contamination: FALSE POSITIVE Risk', fontweight='bold', loc='left', fontsize=12)
 ax.set_xticks(x)
 ax.set_xticklabels([f'k={k}' for k in k_sizes])
-ax.legend(fontsize=8, loc='upper right')
-ax.grid(axis='y', alpha=0.3)
-ax.set_ylim(0, 100)
+ax.legend(fontsize=10, loc='upper right')
+ax.grid(axis='y', alpha=0.3, linestyle='--')
+ax.set_ylim(0, max(ax.get_ylim()[1], 1.2))
 
-# Add annotation
-ax.text(0.02, 0.98, '⚠️ Cross-contamination = FALSE POSITIVES (dangerous!)\n✓ Novel = Information loss only',
-        transform=ax.transAxes, fontsize=9, va='top',
-        bbox=dict(boxstyle='round', facecolor='yellow', alpha=0.3))
+# Add value labels on bars
+for bars in [bars1, bars2]:
+    for bar in bars:
+        height = bar.get_height()
+        if height > 0:
+            ax.text(bar.get_x() + bar.get_width()/2., height,
+                   f'{height:.3f}%',
+                   ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+# Add threshold line
+ax.axhline(y=0.5, color='green', linestyle='--', alpha=0.7, linewidth=2)
+ax.text(len(k_sizes)-0.5, 0.52, 'All <1% - Excellent!', ha='right', va='bottom',
+        fontsize=10, color='green', fontweight='bold',
+        bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.5))
+
+# Add biological note
+ax.text(0.02, 0.98, 'Note: ~99% of errors become "novel" (information loss)\n      <1% cause cross-contamination (false positives)',
+        transform=ax.transAxes, fontsize=8, va='top', style='italic',
+        bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.4))
 
 # Panel C: Heatmap of Cross-Contamination Rate by database (THE DANGEROUS ONE!)
 ax = axes[1, 0]
@@ -139,12 +143,13 @@ cen_dbs = [db for db in pivot.index if '_CEN_' in db]
 ordered_dbs = sorted(arms_dbs) + sorted(cen_dbs)
 pivot = pivot.loc[ordered_dbs]
 
-sns.heatmap(pivot, annot=True, fmt='.2f', cmap='RdYlGn_r',
+sns.heatmap(pivot, annot=True, fmt='.3f', cmap='RdYlGn_r',
             cbar_kws={'label': 'Cross-Contamination (%)'},
-            ax=ax, linewidths=0.5, vmin=0, vmax=1.0)
+            ax=ax, linewidths=0.5, vmin=0, vmax=1.0, cbar=True)
 ax.set_xlabel('K-mer Size', fontweight='bold', fontsize=11)
 ax.set_ylabel('Database', fontweight='bold', fontsize=11)
-ax.set_title('C. Cross-Contamination Rate (False Positives!)', fontweight='bold', loc='left', fontsize=12)
+ax.set_title('C. Per-Database Cross-Contamination (FP Risk)', fontweight='bold', loc='left', fontsize=12)
+ax.tick_params(axis='y', labelsize=7)
 
 # Add separator line between ARMS and CEN
 separator_idx = len(arms_dbs)
@@ -152,27 +157,46 @@ ax.axhline(y=separator_idx, color='blue', linewidth=3)
 ax.text(-0.5, separator_idx/2, 'ARMS', rotation=90, va='center', fontweight='bold', fontsize=10)
 ax.text(-0.5, separator_idx + (len(cen_dbs)/2), 'CEN', rotation=90, va='center', fontweight='bold', fontsize=10)
 
-# Panel D: Database Cross-Contamination Ranking (FALSE POSITIVE RISK!)
+# Panel D: Novel vs Cross-Contamination - Stacked View for k=21 and k=41 Comparison
 ax = axes[1, 1]
 
-# Calculate mean cross-contamination rate across all k-sizes for each database
-db_summary = df.groupby(['database', 'region'])['pct_wrong_db'].mean().reset_index()
-db_summary = db_summary.sort_values('pct_wrong_db')
+# Get data for k=21 and k=41 (extreme cases)
+k_compare = [21, 41]
+novel_data = []
+cross_data = []
+labels = []
 
-colors = ['#66c2a5' if r == 'ARMS' else '#fc8d62' for r in db_summary['region']]
-bars = ax.barh(range(len(db_summary)), db_summary['pct_wrong_db'], color=colors)
-ax.set_yticks(range(len(db_summary)))
-ax.set_yticklabels(db_summary['database'], fontsize=8)
-ax.set_xlabel('Mean Cross-Contamination Rate (%)', fontweight='bold', fontsize=11)
-ax.set_title('D. Database False Positive Risk Ranking\n(averaged across k-sizes)', fontweight='bold', loc='left', fontsize=12)
-ax.grid(axis='x', alpha=0.3)
-ax.axvline(x=0.5, color='orange', linestyle='--', alpha=0.5, linewidth=2, label='0.5% threshold')
+for k in k_compare:
+    for region in ['ARMS', 'CEN']:
+        subset = df[(df['k_size'] == k) & (df['region'] == region)]
+        novel_data.append(subset['pct_becomes_novel'].mean())
+        cross_data.append(subset['pct_wrong_db'].mean())
+        labels.append(f'k={k}\n{region}')
 
-# Add legend
-from matplotlib.patches import Patch
-legend_elements = [Patch(facecolor='#66c2a5', label='ARMS'),
-                   Patch(facecolor='#fc8d62', label='CEN')]
-ax.legend(handles=legend_elements, loc='lower right', fontsize=10)
+y_pos = np.arange(len(labels))
+
+# Stacked horizontal bars
+bars1 = ax.barh(y_pos, novel_data, label='Novel (lost)',
+                color='#9ecae1', alpha=0.8, edgecolor='navy')
+bars2 = ax.barh(y_pos, cross_data, left=novel_data, label='Cross-contam (FP!)',
+                color='#d62728', alpha=0.9, edgecolor='darkred', linewidth=2, hatch='///')
+
+ax.set_yticks(y_pos)
+ax.set_yticklabels(labels, fontsize=10, fontweight='bold')
+ax.set_xlabel('% of K-mers WITH Errors', fontweight='bold', fontsize=11)
+ax.set_title('D. Error Fate: k=21 vs k=41 Comparison', fontweight='bold', loc='left', fontsize=12)
+ax.legend(fontsize=10, loc='lower right')
+ax.grid(axis='x', alpha=0.3, linestyle='--')
+ax.set_xlim(0, 100)
+
+# Add value labels
+for i, (novel, cross) in enumerate(zip(novel_data, cross_data)):
+    # Novel percentage
+    ax.text(novel/2, i, f'{novel:.1f}%', ha='center', va='center',
+            fontsize=9, fontweight='bold', color='darkblue')
+    # Cross-contamination percentage
+    ax.text(novel + cross/2, i, f'{cross:.2f}%', ha='center', va='center',
+            fontsize=9, fontweight='bold', color='white')
 
 plt.tight_layout()
 plt.savefig('final_results/02_cross_contamination.png', dpi=300, bbox_inches='tight')
