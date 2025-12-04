@@ -30,13 +30,15 @@ if not all_data:
 
 df = pd.concat(all_data, ignore_index=True)
 
-# Calculate False Discovery Rate (FDR = FP / (FP + TP))
+# Calculate Conditional False Discovery Rate (FDR = FP / (FP + TP))
+# This is among k-mers WITH errors that still match a database
 # FP = pct_wrong_db (k-mers with errors that match wrong database)
 # TP = pct_error_tolerant (k-mers with errors that remain correctly classified)
-df['false_discovery_rate'] = df['pct_wrong_db'] / (df['pct_wrong_db'] + df['pct_error_tolerant']) * 100
+df['conditional_fdr'] = df['pct_wrong_db'] / (df['pct_wrong_db'] + df['pct_error_tolerant']) * 100
 
-# Also calculate absolute FDR (percentage of ALL k-mers, not just those with errors)
-df['absolute_fdr'] = (df['pct_kmers_with_errors'] / 100) * (df['false_discovery_rate'] / 100) * 100
+# Calculate Absolute FDR (percentage of ALL k-mers that become false positives)
+# This is: (% with errors) × (% of those that match wrong database)
+df['absolute_fdr'] = (df['pct_kmers_with_errors'] / 100) * (df['pct_wrong_db'] / 100) * 100
 
 print(f"✓ Loaded data for {len(df)} databases across {len(k_sizes)} k-mer sizes")
 
@@ -60,20 +62,19 @@ bars2 = ax.bar(x + width/2, cen_data['mean'], width, label='CEN',
                color='#fc8d62', yerr=cen_data['std'], capsize=5)
 
 ax.set_xlabel('K-mer Size', fontweight='bold', fontsize=11)
-ax.set_ylabel('False Discovery Rate - FDR (%)', fontweight='bold', fontsize=11)
-ax.set_title('A. False Discovery Rate (FDR = FP/(FP+TP))', fontweight='bold', loc='left', fontsize=12)
+ax.set_ylabel('Absolute FDR (%)', fontweight='bold', fontsize=11)
+ax.set_title('A. Absolute FDR (% of ALL k-mers that are FP)', fontweight='bold', loc='left', fontsize=12)
 ax.set_xticks(x)
 ax.set_xticklabels([f'k={k}' for k in k_sizes])
 ax.legend(fontsize=10)
 ax.grid(axis='y', alpha=0.3)
-ax.set_ylim(0, max(ax.get_ylim()[1], 0.25))
+ax.set_ylim(0, max(ax.get_ylim()[1], 0.25))  # Should show 0-0.25% range
 
-# Add annotation - Note: High conditional FDR is expected since most errors become novel
-# The key metric is absolute FDR (how many of ALL k-mers become false positives)
-ax.axhline(y=50.0, color='orange', linestyle='--', alpha=0.5, linewidth=2)
-ax.text(len(k_sizes)-0.3, 52, 'Note: High conditional FDR expected',
-        ha='right', va='bottom', fontsize=9, color='orange',
-        bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.3))
+# Add annotation showing excellent threshold
+ax.axhline(y=0.2, color='green', linestyle='--', alpha=0.5, linewidth=2)
+ax.text(len(k_sizes)-0.3, 0.21, '✓ Excellent (<0.2%)',
+        ha='right', va='bottom', fontsize=9, color='green', fontweight='bold',
+        bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.3))
 
 # Add value labels
 for bars in [bars1, bars2]:
@@ -86,7 +87,7 @@ for bars in [bars1, bars2]:
 
 # Panel B: Conditional FDR (among k-mers WITH errors)
 ax = axes[0, 1]
-summary_cond = df.groupby(['k_size', 'region'])['false_discovery_rate'].agg(['mean', 'std']).reset_index()
+summary_cond = df.groupby(['k_size', 'region'])['conditional_fdr'].agg(['mean', 'std']).reset_index()
 
 arms_cond = summary_cond[summary_cond['region'] == 'ARMS'].sort_values('k_size')
 cen_cond = summary_cond[summary_cond['region'] == 'CEN'].sort_values('k_size')
@@ -113,9 +114,9 @@ for bars in [bars1, bars2]:
                    f'{height:.2f}%',
                    ha='center', va='bottom', fontsize=9)
 
-# Panel C: Heatmap of FDR by database
+# Panel C: Heatmap of conditional FDR by database
 ax = axes[1, 0]
-pivot = df.pivot_table(values='false_discovery_rate',
+pivot = df.pivot_table(values='conditional_fdr',
                        index='database',
                        columns='k_size')
 pivot = pivot.sort_index()
@@ -142,18 +143,18 @@ ax.text(-0.5, separator_idx + (len(cen_dbs)/2), 'CEN', rotation=90, va='center',
 # Panel D: Comparison - ARMS vs CEN vulnerability
 ax = axes[1, 1]
 
-# Calculate mean FDR across all k-sizes for each database
-db_summary = df.groupby(['database', 'region'])['false_discovery_rate'].mean().reset_index()
-db_summary = db_summary.sort_values('false_discovery_rate')
+# Calculate mean conditional FDR across all k-sizes for each database
+db_summary = df.groupby(['database', 'region'])['conditional_fdr'].mean().reset_index()
+db_summary = db_summary.sort_values('conditional_fdr')
 
 colors = ['#66c2a5' if r == 'ARMS' else '#fc8d62' for r in db_summary['region']]
-bars = ax.barh(range(len(db_summary)), db_summary['false_discovery_rate'], color=colors)
+bars = ax.barh(range(len(db_summary)), db_summary['conditional_fdr'], color=colors)
 ax.set_yticks(range(len(db_summary)))
 ax.set_yticklabels(db_summary['database'], fontsize=8)
-ax.set_xlabel('Mean FDR (%)', fontweight='bold', fontsize=11)
-ax.set_title('D. Database FDR Ranking\n(averaged across k-sizes)', fontweight='bold', loc='left', fontsize=12)
+ax.set_xlabel('Mean Conditional FDR (%)', fontweight='bold', fontsize=11)
+ax.set_title('D. Database Conditional FDR Ranking\n(averaged across k-sizes)', fontweight='bold', loc='left', fontsize=12)
 ax.grid(axis='x', alpha=0.3)
-ax.axvline(x=50.0, color='orange', linestyle='--', alpha=0.5, linewidth=2)
+ax.axvline(x=50.0, color='orange', linestyle='--', alpha=0.5, linewidth=2, label='50% threshold')
 
 # Add legend
 from matplotlib.patches import Patch
@@ -176,9 +177,9 @@ print("-"*80)
 for k in k_sizes:
     for region in ['ARMS', 'CEN']:
         subset = df[(df['k_size'] == k) & (df['region'] == region)]
-        mean_fdr = subset['false_discovery_rate'].mean()
-        max_fdr = subset['false_discovery_rate'].max()
-        print(f"k={k:<5} {region:<8} {mean_fdr:>6.2f}%          {max_fdr:>6.2f}%")
+        mean_abs = subset['absolute_fdr'].mean()
+        mean_cond = subset['conditional_fdr'].mean()
+        print(f"k={k:<5} {region:<8} Abs: {mean_abs:>6.4f}%    Cond: {mean_cond:>6.2f}%")
 print("="*80)
 print("\n💡 Key Findings:")
 print(f"   • FDR = FP/(FP+TP) - proper false discovery rate calculation")
