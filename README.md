@@ -194,12 +194,20 @@ Original k-mer with error → 3 possible outcomes:
 ```
 
 **The math**:
-- **Conditional FDR** = FP / (FP + TP) = 0.7 / (0.7 + 0.06) = **92%**
-  - Among the small fraction (0.76%) that still match a database, most (92%) are wrong!
+- **Conditional FDR** = FP / (FP + TP) = 0.7% / (0.7% + 0.06%) = 0.7/0.76 = **92%**
+  - Among the small fraction (0.76% = FP + TP) that still match a database, most (92%) are wrong!
 
-- **Absolute FDR** = (% with errors) × (Conditional FDR)
-  - For k=21: 19% × 92% × 0.76% = **0.13%** of ALL k-mers
+- **Absolute FDR** = FP / All k-mers = (% with errors) × (% that become FP)
+  - For k=21: 19% × 0.7% = **0.13%** of ALL k-mers
   - This is excellent! Very few false positives overall.
+
+**Or thinking with concrete numbers (per 100,000 k-mers):**
+- 19,000 k-mers get errors
+- 18,868 become "novel" (99.2% of those with errors)
+- 57 stay correctly classified - TP (0.06% of those with errors)
+- 75 match wrong database - FP (0.7% of those with errors)
+- **Conditional FDR** = 75/(75+57) = 75/132 = **57%** for this example
+- **Absolute FDR** = 75/100,000 = **0.075%** ✓ Excellent!
 
 **The Key Insight**:
 - 📉 **99% of errors become "novel" k-mers** → causes read LOSS (bad for sensitivity)

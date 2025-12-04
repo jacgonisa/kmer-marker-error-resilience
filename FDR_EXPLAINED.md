@@ -208,11 +208,11 @@ If using R10.4+ data, your retention will be even better!
 
 Think of it like this:
 - 1000 k-mers with errors
-- 992 disappear (novel)
-- 8 remain (match a database)
-- Of those 8, maybe 7 are wrong (FP) and 1 is right (TP)
-- Conditional FDR = 7/8 = 87.5% (high!)
-- Absolute FDR = 7/1000 = 0.7% (low!)
+- 992 disappear (novel - don't match ANY database) → Read lost
+- 8 remain (match at least one database)
+  - Of those 8: **1 is correct (TP)** and **7 are wrong (FP)**
+- Conditional FDR = FP/(FP+TP) = 7/(7+1) = 7/8 = 87.5% (high!)
+- Absolute FDR = FP/Total = 7/1000 = 0.7% (low!)
 
 ### Q2: Should I be worried about the high conditional FDR?
 
